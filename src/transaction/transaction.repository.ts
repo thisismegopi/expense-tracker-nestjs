@@ -21,13 +21,24 @@ export class TransactionRepository extends Repository<Transaction> {
     async getTransactions(filter: getTransactionDto) {
         const { days, type, withCategory } = filter;
         const transactionQuery = this.createQueryBuilder('transaction');
+
         if (withCategory) {
             transactionQuery.leftJoinAndSelect('transaction.category', 'category');
         }
-        transactionQuery.where('transaction.dateTime >= :time', { time: utc().subtract(days, 'days') });
+
+        if (filter.days) {
+            transactionQuery.where('transaction.dateTime >= :time', { time: utc().subtract(days, 'days') });
+        } else {
+            transactionQuery.where('transaction.dateTime >= :from', { from: utc().startOf('month') });
+            transactionQuery.andWhere('transaction.dateTime <= :to', { to: utc().endOf('month') });
+        }
+
         transactionQuery.andWhere('transaction.transactionType = :type', { type });
+
         const [transactions, count] = await transactionQuery.getManyAndCount();
-        return { transactions, count };
+        const totalAmount = transactions.reduce((accumulator, currentValue) => accumulator + Number(currentValue.amount), 0);
+
+        return { count, totalAmount, transactions };
     }
 
     async createTransaction(createTransactionData: CreateTransactionDto, category: Category) {

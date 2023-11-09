@@ -32,12 +32,12 @@ export class getTransactionDto {
     @IsEnum(TransactionType)
     type: TransactionType;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsNumber()
     @Min(1)
     @Max(90)
     @Type(() => Number)
-    days: number;
+    days?: number;
 
     @IsNotEmpty()
     @IsBoolean()
