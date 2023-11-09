@@ -1,12 +1,33 @@
 import { EntityManager, Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
-import { CreateTransactionDto } from './dto';
+import { CreateTransactionDto, UpdateTransactionDto, getTransactionDto } from './dto';
 import { Category } from 'src/category/category.entity';
-import { ConflictException, InternalServerErrorException } from '@nestjs/common';
+import { ConflictException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { utc } from 'moment';
 
 export class TransactionRepository extends Repository<Transaction> {
     constructor(manager: EntityManager) {
         super(Transaction, manager);
+    }
+
+    async getTransactionById(id: string, loadRelation = false) {
+        const found = await this.findOne({ where: { transactionId: id }, relations: { category: loadRelation } });
+        if (!found) {
+            throw new NotFoundException(`Transaction with ID "${id}" not found`);
+        }
+        return found;
+    }
+
+    async getTransactions(filter: getTransactionDto) {
+        const { days, type, withCategory } = filter;
+        const transactionQuery = this.createQueryBuilder('transaction');
+        if (withCategory) {
+            transactionQuery.leftJoinAndSelect('transaction.category', 'category');
+        }
+        transactionQuery.where('transaction.dateTime >= :time', { time: utc().subtract(days, 'days') });
+        transactionQuery.andWhere('transaction.transactionType = :type', { type });
+        const [transactions, count] = await transactionQuery.getManyAndCount();
+        return { transactions, count };
     }
 
     async createTransaction(createTransactionData: CreateTransactionDto, category: Category) {
@@ -20,5 +41,17 @@ export class TransactionRepository extends Repository<Transaction> {
         } catch (error) {
             throw new InternalServerErrorException();
         }
+    }
+
+    async updateTransaction(id: string, updateTransactionData: UpdateTransactionDto, category?: Category) {
+        const { amount, dateTime, note, transactionType } = updateTransactionData;
+        if (category && category.categoryType != transactionType) {
+            throw new ConflictException('Transaction type and category type missmatch');
+        }
+        const transaction = await this.update(id, { transactionType, amount, dateTime, note, category });
+        if (transaction.affected === 0) {
+            throw new NotFoundException(`Transaction with ID "${id}" not found`);
+        }
+        return await this.getTransactionById(id, true);
     }
 }
