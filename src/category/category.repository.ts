@@ -9,7 +9,7 @@ export class CategoryRepository extends Repository<Category> {
     }
 
     async getCategoryById(id: string) {
-        const found = this.findOne({ where: { categoryId: id } });
+        const found = await this.findOne({ where: { categoryId: id } });
         if (!found) {
             throw new NotFoundException(`Category with ID "${id}" not found`);
         }
