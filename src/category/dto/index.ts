@@ -1,3 +1,4 @@
+import { PartialType } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { TransactionType } from 'src/transaction/enum';
 
@@ -19,14 +20,4 @@ export class CreateCategoryDto {
     categoryType: TransactionType;
 }
 
-export class UpdateCategoryDto {
-    @IsOptional()
-    @MinLength(8)
-    @MaxLength(32)
-    @IsString()
-    categoryName?: string;
-
-    @IsOptional()
-    @IsEnum(TransactionType)
-    categoryType?: TransactionType;
-}
+export class UpdateCategoryDto extends PartialType(CreateCategoryDto) {}

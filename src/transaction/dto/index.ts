@@ -2,6 +2,7 @@ import { IsBoolean, IsDateString, IsDecimal, IsEnum, IsNotEmpty, IsNumber, IsOpt
 import { TransactionType } from '../enum';
 import { isBefore } from '../validator/data';
 import { Type } from 'class-transformer';
+import { PartialType } from '@nestjs/swagger';
 
 export class CreateTransactionDto {
     @IsEnum(TransactionType)
@@ -28,9 +29,10 @@ export class CreateTransactionDto {
 }
 
 export class getTransactionDto {
+    @IsOptional()
     @IsNotEmpty()
     @IsEnum(TransactionType)
-    type: TransactionType;
+    type?: TransactionType;
 
     @IsOptional()
     @IsNumber()
@@ -38,34 +40,6 @@ export class getTransactionDto {
     @Max(90)
     @Type(() => Number)
     days?: number;
-
-    @IsNotEmpty()
-    @IsBoolean()
-    @Type(() => Boolean)
-    withCategory: boolean;
 }
 
-export class UpdateTransactionDto {
-    @IsEnum(TransactionType)
-    @IsOptional()
-    transactionType?: TransactionType;
-
-    @IsDecimal({ decimal_digits: '1,3' })
-    @IsOptional()
-    amount?: number;
-
-    @IsString()
-    @MinLength(8)
-    @MaxLength(32)
-    @IsOptional()
-    note?: string;
-
-    @IsDateString({ strict: true })
-    @IsOptional()
-    @isBefore({ message: 'Please enter a valid past time' })
-    dateTime?: Date;
-
-    @IsUUID(4)
-    @IsOptional()
-    categoryId?: string;
-}
+export class UpdateTransactionDto extends PartialType(CreateTransactionDto) {}

@@ -1,4 +1,4 @@
-import { EntityManager, Repository } from 'typeorm';
+import { Between, EntityManager, MoreThanOrEqual, Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { CreateTransactionDto, UpdateTransactionDto, getTransactionDto } from './dto';
 import { Category } from 'src/category/category.entity';
@@ -19,26 +19,21 @@ export class TransactionRepository extends Repository<Transaction> {
     }
 
     async getTransactions(filter: getTransactionDto) {
-        const { days, type, withCategory } = filter;
-        const transactionQuery = this.createQueryBuilder('transaction');
+        const { days, type } = filter;
 
-        if (withCategory) {
-            transactionQuery.leftJoinAndSelect('transaction.category', 'category');
-        }
-
-        if (filter.days) {
-            transactionQuery.where('transaction.dateTime >= :time', { time: utc().subtract(days, 'days') });
-        } else {
-            transactionQuery.where('transaction.dateTime >= :from', { from: utc().startOf('month') });
-            transactionQuery.andWhere('transaction.dateTime <= :to', { to: utc().endOf('month') });
-        }
-
-        transactionQuery.andWhere('transaction.transactionType = :type', { type });
-
-        const [transactions, count] = await transactionQuery.getManyAndCount();
-        const totalAmount = transactions.reduce((accumulator, currentValue) => accumulator + Number(currentValue.amount), 0);
-
-        return { count, totalAmount, transactions };
+        const [transactions, totalTransactions] = await this.findAndCount({
+            relations: {
+                category: true,
+            },
+            where: {
+                transactionType: type ?? undefined,
+                dateTime: days ? MoreThanOrEqual(utc().subtract(days, 'days').toDate()) : Between(utc().startOf('month').toDate(), utc().endOf('month').toDate()),
+            },
+            order: {
+                dateTime: 'DESC',
+            },
+        });
+        return { transactions, totalTransactions };
     }
 
     async createTransaction(createTransactionData: CreateTransactionDto, category: Category) {
