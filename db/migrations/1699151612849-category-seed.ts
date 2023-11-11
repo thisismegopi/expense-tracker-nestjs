@@ -1,5 +1,5 @@
-import { Category } from 'src/category/category.entity';
-import { TransactionType } from 'src/transaction/enum';
+import { Category } from 'src/app/category/category.entity';
+import { TransactionType } from 'src/app/transaction/enum';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 const ICOME_DATA = [

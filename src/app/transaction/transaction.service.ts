@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { TransactionRepository } from './transaction.repository';
-import { CreateTransactionDto, UpdateTransactionDto, getTransactionDto } from './dto';
+import { CreateTransaction, UpdateTransaction, GetAllTransaction } from './dto/request.dto';
 import { CategoryRepository } from '../category/category.repository';
 import { Category } from '../category/category.entity';
 import { TransactionType } from './enum';
@@ -16,7 +16,7 @@ export class TransactionService {
         return this.transactionRepository.getTransactionById(id, true);
     }
 
-    async getTransactions(filter: getTransactionDto) {
+    async getTransactions(filter: GetAllTransaction) {
         const { type } = filter;
 
         let transactionType: TransactionType | 'ALL' = 'ALL';
@@ -34,12 +34,12 @@ export class TransactionService {
         return { transactionType, totalTransactions, totalExpense, totalIncome, transactions };
     }
 
-    async createTransaction(createTransactionData: CreateTransactionDto) {
+    async createTransaction(createTransactionData: CreateTransaction) {
         const category = await this.categoryRepository.getCategoryById(createTransactionData.categoryId);
         return await this.transactionRepository.createTransaction(createTransactionData, category);
     }
 
-    async updateTransaction(transactionId: string, updateTransactionData: UpdateTransactionDto) {
+    async updateTransaction(transactionId: string, updateTransactionData: UpdateTransaction) {
         let category: Category = undefined;
         if (updateTransactionData.categoryId) {
             category = await this.categoryRepository.getCategoryById(updateTransactionData.categoryId);

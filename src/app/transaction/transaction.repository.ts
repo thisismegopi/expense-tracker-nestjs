@@ -1,7 +1,7 @@
 import { Between, EntityManager, MoreThanOrEqual, Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
-import { CreateTransactionDto, UpdateTransactionDto, getTransactionDto } from './dto';
-import { Category } from 'src/category/category.entity';
+import { CreateTransaction, UpdateTransaction, GetAllTransaction } from './dto/request.dto';
+import { Category } from '../category/category.entity';
 import { ConflictException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { utc } from 'moment';
 
@@ -18,7 +18,7 @@ export class TransactionRepository extends Repository<Transaction> {
         return found;
     }
 
-    async getTransactions(filter: getTransactionDto) {
+    async getTransactions(filter: GetAllTransaction) {
         const { days, type } = filter;
 
         const [transactions, totalTransactions] = await this.findAndCount({
@@ -36,7 +36,7 @@ export class TransactionRepository extends Repository<Transaction> {
         return { transactions, totalTransactions };
     }
 
-    async createTransaction(createTransactionData: CreateTransactionDto, category: Category) {
+    async createTransaction(createTransactionData: CreateTransaction, category: Category) {
         const { amount, dateTime, transactionType, note } = createTransactionData;
         if (category.categoryType != transactionType) {
             throw new ConflictException('Transaction type and category type missmatch');
@@ -49,7 +49,7 @@ export class TransactionRepository extends Repository<Transaction> {
         }
     }
 
-    async updateTransaction(id: string, updateTransactionData: UpdateTransactionDto, category?: Category) {
+    async updateTransaction(id: string, updateTransactionData: UpdateTransaction, category?: Category) {
         const { amount, dateTime, note, transactionType } = updateTransactionData;
         if (category && category.categoryType != transactionType) {
             throw new ConflictException('Transaction type and category type missmatch');

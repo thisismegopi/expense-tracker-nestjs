@@ -1,6 +1,6 @@
 import { EntityManager, Repository } from 'typeorm';
 import { Category } from './category.entity';
-import { CreateCategoryDto, GetCategoryFilterDto, UpdateCategoryDto } from './dto';
+import { CreateCategory, GetAllCategory, UpdateCategory } from './dto/request.dto';
 import { ConflictException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 
 export class CategoryRepository extends Repository<Category> {
@@ -16,18 +16,18 @@ export class CategoryRepository extends Repository<Category> {
         return found;
     }
 
-    async getAllCategories(filter: GetCategoryFilterDto) {
+    async getAllCategories(filter: GetAllCategory) {
         const { type } = filter;
         return await this.find({ where: { categoryType: type } });
     }
 
-    async createCategory(data: CreateCategoryDto) {
+    async createCategory(data: CreateCategory) {
         const { categoryName, categoryType } = data;
 
         const category = this.create({ categoryName, categoryType });
 
         try {
-            await this.save(category);
+            return await this.save(category);
         } catch (error) {
             if (error.code === '23505') {
                 throw new ConflictException('Category already exists');
@@ -37,7 +37,7 @@ export class CategoryRepository extends Repository<Category> {
         }
     }
 
-    async updateCategory(id: string, data: UpdateCategoryDto) {
+    async updateCategory(id: string, data: UpdateCategory) {
         const { categoryName, categoryType } = data;
 
         const category = await this.update(id, { categoryName, categoryType });
