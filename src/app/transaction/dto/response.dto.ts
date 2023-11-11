@@ -6,7 +6,7 @@ export class Transaction {
     @ApiProperty({ format: 'uuid' })
     transactionId: string;
 
-    @ApiProperty({ enum: TransactionType })
+    @ApiProperty({ enum: TransactionType, enumName: 'TransactionType' })
     transactionType: TransactionType;
 
     @ApiProperty()
@@ -29,7 +29,7 @@ export class Transaction {
 }
 
 export class GetTransactions {
-    @ApiProperty({ enum: TransactionType })
+    @ApiProperty({ enum: TransactionType, enumName: 'TransactionType' })
     transactionType: TransactionType | 'ALL';
 
     @ApiProperty()

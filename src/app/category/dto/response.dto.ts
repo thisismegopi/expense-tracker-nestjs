@@ -8,7 +8,7 @@ export class Category {
     @ApiProperty()
     categoryName: string;
 
-    @ApiProperty({ enum: TransactionType })
+    @ApiProperty({ enum: TransactionType, enumName: 'TransactionType' })
     categoryType: TransactionType;
 
     @ApiProperty()

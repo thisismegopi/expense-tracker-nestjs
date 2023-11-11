@@ -3,7 +3,7 @@ import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from '
 import { TransactionType } from '../../transaction/enum';
 
 export class GetAllCategory {
-    @ApiProperty({ enum: TransactionType, required: false })
+    @ApiProperty({ enum: TransactionType, required: false, enumName: 'TransactionType' })
     @IsOptional()
     @IsEnum(TransactionType)
     type?: TransactionType;
@@ -17,7 +17,7 @@ export class CreateCategory {
     @IsString()
     categoryName: string;
 
-    @ApiProperty({ enum: TransactionType })
+    @ApiProperty({ enum: TransactionType, enumName: 'TransactionType' })
     @IsNotEmpty()
     @IsEnum(TransactionType)
     categoryType: TransactionType;

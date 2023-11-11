@@ -5,7 +5,7 @@ import { Type } from 'class-transformer';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 
 export class CreateTransaction {
-    @ApiProperty({ enum: TransactionType })
+    @ApiProperty({ enum: TransactionType, enumName: 'TransactionType' })
     @IsEnum(TransactionType)
     @IsNotEmpty()
     transactionType: TransactionType;
@@ -35,12 +35,12 @@ export class CreateTransaction {
 }
 
 export class GetAllTransaction {
-    @ApiProperty({ enum: TransactionType, required: false })
+    @ApiProperty({ enum: TransactionType, required: false, enumName: 'TransactionType' })
     @IsOptional()
     @IsEnum(TransactionType)
     type?: TransactionType;
 
-    @ApiProperty({ minimum: 1, maximum: 90, required: false })
+    @ApiProperty({ minimum: 1, maximum: 90, required: false, enumName: 'TransactionType' })
     @IsOptional()
     @IsNumber()
     @Min(1)
