@@ -28,8 +28,8 @@ export class TransactionService {
 
         const { totalTransactions, transactions } = await this.transactionRepository.getTransactions(filter);
 
-        totalExpense = transactions.filter(t => t.transactionType === TransactionType.EXPENSE).reduce((acc, curr) => acc + Number(curr.amount), 0);
-        totalIncome = transactions.filter(t => t.transactionType === TransactionType.INCOME).reduce((acc, curr) => acc + Number(curr.amount), 0);
+        totalExpense = transactions.filter(t => t.transactionType === TransactionType.EXPENSE).reduce((acc, curr) => acc + Number(curr.amount), totalExpense);
+        totalIncome = transactions.filter(t => t.transactionType === TransactionType.INCOME).reduce((acc, curr) => acc + Number(curr.amount), totalIncome);
 
         return { transactionType, totalTransactions, totalExpense, totalIncome, transactions };
     }

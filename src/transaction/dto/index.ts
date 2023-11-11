@@ -1,4 +1,4 @@
-import { IsBoolean, IsDateString, IsDecimal, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Max, MaxLength, Min, MinLength } from 'class-validator';
 import { TransactionType } from '../enum';
 import { isBefore } from '../validator/data';
 import { Type } from 'class-transformer';
@@ -9,8 +9,9 @@ export class CreateTransactionDto {
     @IsNotEmpty()
     transactionType: TransactionType;
 
-    @IsDecimal({ decimal_digits: '1,3' })
     @IsNotEmpty()
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Type(() => Number)
     amount: number;
 
     @IsString()
