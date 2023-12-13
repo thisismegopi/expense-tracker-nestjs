@@ -7,6 +7,7 @@ const databaseConfig = registerAs('database', () => ({
     synchronize: false,
     logging: process.env.NODE_ENV === 'development',
     entities: [`${__dirname}/../../../**/*.entity{.ts,.js}`],
+    migrations: [`${__dirname}/../../../db/migrations/*{.ts,.js}`],
 }));
 
 export default databaseConfig;
