@@ -4,7 +4,7 @@ import { utc, now } from 'moment';
 
 @ValidatorConstraint({ name: 'isBefore' })
 @Injectable()
-export class CustomEmailvalidation implements ValidatorConstraintInterface {
+export class Customvalidation implements ValidatorConstraintInterface {
     validate(value: string): boolean {
         if (!utc(value).isValid()) return false;
         if (!utc(value).isBefore(now())) return false;
@@ -22,7 +22,7 @@ export function isBefore(validationOptions?: ValidationOptions) {
             target: object.constructor,
             propertyName: propertyName,
             options: validationOptions,
-            validator: CustomEmailvalidation,
+            validator: Customvalidation,
         });
     };
 }
