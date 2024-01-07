@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
 import { TransactionRepository } from './transaction.repository';
 import { CreateTransaction, UpdateTransaction, GetAllTransaction } from './dto/request.dto';
 import { CategoryRepository } from '../category/category.repository';
 import { Category } from '../category/category.entity';
 import { TransactionType } from './enum';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class TransactionService {
-    constructor(private readonly datasource: DataSource) {}
-    private readonly transactionRepository = new TransactionRepository(this.datasource.manager);
-    private readonly categoryRepository = new CategoryRepository(this.datasource.manager);
+    constructor(
+        @InjectRepository(TransactionRepository) private readonly transactionRepository: TransactionRepository,
+        @InjectRepository(CategoryRepository) private readonly categoryRepository: CategoryRepository,
+    ) {}
 
     getTransactionById(id: string) {
         return this.transactionRepository.getTransactionById(id, true);

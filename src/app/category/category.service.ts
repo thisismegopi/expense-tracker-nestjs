@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Category } from './category.entity';
 import { CategoryRepository } from './category.repository';
-import { DataSource } from 'typeorm';
 import { CreateCategory, GetAllCategory, UpdateCategory } from './dto/request.dto';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class CategoryService {
-    constructor(private readonly datasource: DataSource) {}
-    private readonly categoryRepository = new CategoryRepository(this.datasource.manager);
+    constructor(@InjectRepository(CategoryRepository) private readonly categoryRepository: CategoryRepository) {}
 
     getCategory(filter: GetAllCategory): Promise<Category[]> {
         return this.categoryRepository.getAllCategories(filter);

@@ -1,6 +1,7 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
+import { Environment } from '../config/env.validation';
 
 @Injectable()
 export class AppLifeCycleService implements OnApplicationBootstrap {
@@ -8,7 +9,9 @@ export class AppLifeCycleService implements OnApplicationBootstrap {
 
     async onApplicationBootstrap() {
         await this.datasource.query(`CREATE SCHEMA IF NOT EXISTS ${this.config.get<string>('database.schema')}`);
-        await this.datasource.runMigrations({ transaction: 'each' });
-        console.log('Migration completed!');
+        if (this.config.get<Environment>('app.ENV') !== Environment.Development) {
+            await this.datasource.runMigrations({ transaction: 'each' });
+            console.log('Migration completed!');
+        }
     }
 }
